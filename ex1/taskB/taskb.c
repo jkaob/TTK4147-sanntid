@@ -34,6 +34,7 @@ double times_method_avg(){
     static struct tms start_time;
     static struct tms end_time;
 
+    //n = 10*1000*1000
     for (int i = 0; i < 10 * 1000 * 1000; i++)
     { // read timer}
         times(&end_time);

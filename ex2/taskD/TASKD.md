@@ -1,0 +1,2 @@
+# Task D
+malloc doesn't always allocate exactly what you request. Sometimes it simply "promises" that you will get that memory when you need it. Looking at the actual memory usage, it is seen that it doesn't behave exatcly like the plots.
