@@ -1,0 +1,33 @@
+# TASK A
+
+# TASK B
+## Only A vs A,B,C
+A alone had lower max time than any of A,B,C in the joint test.
+The variance of A alone was also significantly lower than any of A,B,C in the joint test.
+
+In the joint test, the variance of A was approx 3 times the variance of A alone.
+The max value of A alone was lower, but the change was not so significant as with the variance.
+
+## Lowest variance
+A has lowest variance
+## Lowest max
+C has the lowest max
+
+## A,B and C equal?
+They are quite similar.
+
+# TASK C
+
+The test with interrupt provided signifcant better results, with variance around 0.2-0.3 us, and worst max times approximately halved.
+A behaves better than B which again behaves better than C.
+
+# TASK D
+
+## Deferred technique
+The deferred technique is slower than immediate processing. That is because the program still has to wait for the while loop before any action is taken. \
+The positive effect is that the program spends less time in the interrupt handler, so if the repsonse time is sufficient, it can be a good choice with the deferred technique.
+
+## Expensive B
+
+Expensive B had least effect on A with immediate processing, while it had least effect on C with deferred interrupt handling. We suspect this has to do with the order of the tests, \
+and the fact that the interrupt handler for C cannot start before the interrupt handler for B is  finished. In deferred interrupt handling, the interrupt handler would be sooner ready to handle interrupt from C.

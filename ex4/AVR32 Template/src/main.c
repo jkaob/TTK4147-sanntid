@@ -14,6 +14,9 @@
 #define TEST_C      AVR32_PIN_PA27
 #define RESPONSE_C  AVR32_PIN_PB00
 
+volatile int FLAG_A = 0;
+volatile int FLAG_B = 0;
+volatile int FLAG_C = 0;
 
 __attribute__((__interrupt__)) static void interrupt_J3(void);
 
@@ -36,8 +39,26 @@ void init(){
 }
 
 __attribute__((__interrupt__)) static void interrupt_J3(void){ 
-
+	
+	if (gpio_get_pin_interrupt_flag(TEST_A)){
+		gpio_clear_pin_interrupt_flag(TEST_A);
+		FLAG_A = 1;
+	
+	} else if (gpio_get_pin_interrupt_flag(TEST_B)){
+		gpio_clear_pin_interrupt_flag(TEST_B);
+		FLAG_B = 1;
+	
+	} else if (gpio_get_pin_interrupt_flag(TEST_C)){
+		gpio_clear_pin_interrupt_flag(TEST_C);
+		FLAG_C = 1;
+	
+	}
+	return;
+	
 }
+
+
+
 
 
 int main (void){
@@ -49,28 +70,58 @@ int main (void){
 	gpio_configure_pin(RESPONSE_B, GPIO_DIR_OUTPUT | GPIO_INIT_HIGH);
 	gpio_configure_pin(RESPONSE_C, GPIO_DIR_OUTPUT | GPIO_INIT_HIGH);
 	
+	cpu_irq_disable();
+	gpio_enable_pin_interrupt(TEST_A, GPIO_DIR_INPUT | GPIO_INIT_HIGH);
+	gpio_enable_pin_interrupt(TEST_B, GPIO_DIR_INPUT | GPIO_INIT_HIGH);
+	gpio_enable_pin_interrupt(TEST_C, GPIO_DIR_INPUT | GPIO_INIT_HIGH);
+	cpu_irq_enable();
+	
+	
     
     while(1){
-		while(1){
-			if (!gpio_get_pin_value(TEST_A)){
-				gpio_set_pin_low(RESPONSE_A);
-				busy_delay_us(5);
-				gpio_set_pin_high(RESPONSE_A);
-			}
-			if (!gpio_get_pin_value(TEST_B)){
-				gpio_set_pin_low(RESPONSE_B);
-				busy_delay_us(5);
-				gpio_set_pin_high(RESPONSE_B);
-			}
-			if (!gpio_get_pin_value(TEST_C)){
-				gpio_set_pin_low(RESPONSE_C);
-				busy_delay_us(5);
-				gpio_set_pin_high(RESPONSE_C);
-			}
+			
+		
+		
+		if (FLAG_A){
+			gpio_set_pin_low(RESPONSE_A);
+			busy_delay_us(5);
+			gpio_set_pin_high(RESPONSE_A);
+			FLAG_A = 0;
 		}
-		
-		
+		if (FLAG_B){
+			busy_delay_us(100);
+			gpio_set_pin_low(RESPONSE_B);
+			busy_delay_us(5);
+			gpio_set_pin_high(RESPONSE_B);
+			FLAG_B = 0;
+		}
+		if (FLAG_C){
+			gpio_set_pin_low(RESPONSE_C);
+			busy_delay_us(5);
+			gpio_set_pin_high(RESPONSE_C);
+			FLAG_C = 0;
+		}
         //gpio_toggle_pin(LED0_GPIO);
-        //printf("tick\n");
-    }
+        //printf("TEST_ A: %d\n RESPONSE_A: %d\nTEST_ C: %d\n RESPONSE_C: %d\n",TEST_A, RESPONSE_A, TEST_C, RESPONSE_C);
+		//busy_delay_ms(500);
+ 
+	}
+	return 0;
 }
+
+/* TASK B
+if (!gpio_get_pin_value(TEST_A)){
+gpio_set_pin_low(RESPONSE_A);
+busy_delay_us(5);
+gpio_set_pin_high(RESPONSE_A);
+}
+if (!gpio_get_pin_value(TEST_B)){
+gpio_set_pin_low(RESPONSE_B);
+busy_delay_us(5);
+gpio_set_pin_high(RESPONSE_B);
+}
+if (!gpio_get_pin_value(TEST_C)){
+gpio_set_pin_low(RESPONSE_C);
+busy_delay_us(5);
+gpio_set_pin_high(RESPONSE_C);
+}*/
