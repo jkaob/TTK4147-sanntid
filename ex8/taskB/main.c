@@ -19,30 +19,6 @@ void busy_wait_us(unsigned long delay)
 	}	
 }
 
-void task_low(void* args)
-{
-	rt_sem_p(&sem_init, TM_INFINITE);
-	
-	// Lock. busy wait 3 time units. unlock.
-	rt_printf("Task low trying to lock sem\n");
-	rt_sem_p(&sem, TM_INFINITE);
-	rt_printf("Task low locked sem\n");
-	busy_wait_us(3);
-	rt_sem_v(&sem);
-	rt_printf("Task low unlocked sem\n");
-}
-
-void task_med(void* args)
-{
-	rt_sem_p(&sem_init, TM_INFINITE);
-	
-	// Sleep 1 time unit, busy wait 5 time units
-	rt_printf("Task med start\n");
-	rt_task_sleep(1000);
-	busy_wait_us(5);
-	rt_printf("Task med done\n");
-}
-
 void task_high(void* args)
 {
 	rt_sem_p(&sem_init, TM_INFINITE);
@@ -54,6 +30,30 @@ void task_high(void* args)
 	busy_wait_us(2);
 	rt_sem_v(&sem);
 	rt_printf("Task high unlocked sem\n");
+}
+void task_med(void* args)
+{
+	rt_sem_p(&sem_init, TM_INFINITE);
+	
+	// Sleep 1 time unit, busy wait 5 time units
+	rt_printf("Task med start\n");
+	rt_task_sleep(1000);
+	busy_wait_us(5);
+	rt_printf("Task med done\n");
+}
+
+
+void task_low(void* args)
+{
+	rt_sem_p(&sem_init, TM_INFINITE);
+	
+	// Lock. busy wait 3 time units. unlock.
+	rt_printf("Task low trying to lock sem\n");
+	rt_sem_p(&sem, TM_INFINITE);
+	rt_printf("Task low locked sem\n");
+	busy_wait_us(3);
+	rt_sem_v(&sem);
+	rt_printf("Task low unlocked sem\n");
 }
 
 
@@ -85,10 +85,10 @@ int main(void)
 	rt_task_start(&taskB, task_med,  (void*)2);
 	rt_task_start(&taskC, task_low,  (void*)3);
 
-	rt_timer_spin(100000000);
+	rt_timer_spin(1000000000);
 
-	//rt_task_create(&task_sync, NULL, 0, 99, T_CPU(0));
-	//rt_task_start(&task_sync, sync_fnc, NULL);
+	rt_task_create(&task_sync, NULL, 0, 99, T_CPU(0));
+	rt_task_start(&task_sync, sync_fnc, NULL);
 
 	rt_timer_spin(100000000);
 	
@@ -97,6 +97,7 @@ int main(void)
 	rt_task_join(&taskC);
 	rt_task_join(&task_sync);
 	
+	rt_sem_delete(&sem_init);	
 	rt_sem_delete(&sem);
 
 	return 0;	
