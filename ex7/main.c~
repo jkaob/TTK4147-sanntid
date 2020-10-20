@@ -108,7 +108,7 @@ int main()
         //	pthread_join(dists[i], NULL);
     	//}
 	
-	rt_task_delete(&taskA);
+	rt_task_delete(&taskA)
 	rt_task_join(&taskA);
 	//rt_task_join(&taskB);
 	//rt_task_join(&taskC);

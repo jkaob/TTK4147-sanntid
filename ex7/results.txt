@@ -1,0 +1,40 @@
+
+Reaction test v3
+type	A+B+C
+number	1000
+
+max value	65536
+unit	us
+
+test	A	B	C
+0	overflow
+
+Reaction test v3
+type	A+B+C
+number	1000
+
+max value	65536
+unit	us
+
+test	A	B	C
+0	overflow
+
+Reaction test v3
+type	A+B+C
+number	1000
+
+max value	65536
+unit	us
+
+test	A	B	C
+0	overflow
+
+Reaction test v3
+type	A+B+C
+number	1000
+
+max value	65536
+unit	us
+
+test	A	B	C
+0	overflow
