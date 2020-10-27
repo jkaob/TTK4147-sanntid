@@ -10,7 +10,7 @@
 #include <native/mutex.h>
 
 #define CPU_ID 0
-#define US_TO_S 1000000
+RTIME US_TO_S = 1000;
 
 static RT_SEM sem_lock;
 static RT_SEM sem_init;
@@ -86,7 +86,7 @@ void task_low(void* args)
 	rt_printf("Task low bw 2\n");
 	busy_wait_us(US_TO_S*1);
 	rt_task_inquire(NULL, &temp);	
-	rt_printf("Task low finished busy wait, base pri %d, current pri %d \n", temp.bprio, temp.cprio);
+	rt_printf("Task low finished busy wait, about to unlock \n");
 	rt_sem_v(&sem_lock);
 	rt_printf("Task low unlocked sem, done\n");
 	rt_task_delete(NULL);
@@ -118,9 +118,9 @@ int main(void)
 	
 	rt_printf("sem value: %lu\n", sem_info.count);
 	
-	rt_task_create(&taskA, NULL, 0, 69, T_CPU(0)|T_JOINABLE);
-	rt_task_create(&taskB, NULL, 0, 49, T_CPU(0)|T_JOINABLE);
-	rt_task_create(&taskC, NULL, 0, 19, T_CPU(0)|T_JOINABLE);	
+	rt_task_create(&taskA, "task_high", 0, 69, T_CPU(0)|T_JOINABLE);
+	rt_task_create(&taskB, "task_med", 0, 49, T_CPU(0)|T_JOINABLE);
+	rt_task_create(&taskC, "task_low", 0, 19, T_CPU(0)|T_JOINABLE);	
 	
 	rt_task_shadow(NULL, "main", 99, T_CPU(0));
 	
@@ -128,7 +128,7 @@ int main(void)
 	rt_task_start(&taskB, task_med,  NULL);
 	rt_task_start(&taskC, task_low,  NULL);
 
-	rt_timer_spin(1000000000);
+	rt_task_sleep(1000000000);
 	
 	rt_printf("Broadcasting semaphore\n");
 	rt_sem_broadcast(&sem_init);
@@ -141,13 +141,15 @@ int main(void)
 	//rt_task_join(&taskA);
 	//rt_task_join(&taskB);
 	//rt_task_join(&taskC);
-	rt_task_sleep((long long)US_TO_S*1000);
+	rt_task_sleep(100000000);
 	
-	rt_printf("Program finsihed\n");
+	rt_printf("Program finished\n");
 	
 	rt_sem_delete(&sem_init);	
 	rt_sem_delete(&sem_lock);
-
+	rt_printf("Semaphores deleted\n");
+	
+	exit(EXIT_SUCCESS);
 	return 0;	
 }
 
