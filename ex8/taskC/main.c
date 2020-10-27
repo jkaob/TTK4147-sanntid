@@ -20,14 +20,15 @@ void busy_wait_us(unsigned long delay)
 	}	
 }
 
-void task_low(void* args)
+void task_high(void* args)
 {
 	rt_sem_p(&sem_init, TM_INFINITE);
-	
-	// Lock. busy wait 3 time units. unlock.
+
 	rt_printf("Task %ld start priority %d \n", (long)args, rt_task_inquire(NULL));
+	rt_task_sleep(2000);
+	rt_printf("Task %ld executing priority %d \n", (long)args, rt_task_inquire(NULL));
 	rt_mutex_acquire(&mut, TM_INFINITE);
-	busy_wait_us(3);
+	busy_wait_us(2);
 	rt_printf("Task %ld executing priority %d \n", (long)args, rt_task_inquire(NULL));
 	rt_mutex_release(&mut);
 	rt_printf("Task %ld done\n", (long)args);
@@ -45,19 +46,20 @@ void task_med(void* args)
 	rt_printf("Task %ld done\n", (long)args);
 }
 
-void task_high(void* args)
+void task_low(void* args)
 {
 	rt_sem_p(&sem_init, TM_INFINITE);
-
+	
+	// Lock. busy wait 3 time units. unlock.
 	rt_printf("Task %ld start priority %d \n", (long)args, rt_task_inquire(NULL));
-	rt_task_sleep(2000);
-	rt_printf("Task %ld executing priority %d \n", (long)args, rt_task_inquire(NULL));
 	rt_mutex_acquire(&mut, TM_INFINITE);
-	busy_wait_us(2);
+	busy_wait_us(3);
 	rt_printf("Task %ld executing priority %d \n", (long)args, rt_task_inquire(NULL));
 	rt_mutex_release(&mut);
 	rt_printf("Task %ld done\n", (long)args);
 }
+
+
 
 
 void sync_fnc(void* args)
@@ -80,7 +82,7 @@ int main(void)
 	rt_mutex_create(&mut, NULL);
 	rt_sem_create(&sem_init, NULL, 0, S_PRIO);
 	
-	rt_task_create(&taskA, NULL, 0, 89, T_CPU(0));
+	rt_task_create(&taskA, NULL, 0, 69, T_CPU(0));
 	rt_task_create(&taskB, NULL, 0, 49, T_CPU(0));
 	rt_task_create(&taskC, NULL, 0, 19, T_CPU(0));	
 
